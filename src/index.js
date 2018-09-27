@@ -1,1 +1,1 @@
-export default 'Welcome to recursive-func'
+export { default as recursive } from './recursive'

@@ -4,7 +4,14 @@
 [![npm package][npm-badge]][npm]
 [![Coveralls][coveralls-badge]][coveralls]
 
-Describe recursive-func here.
+Create recursive functions with `Y-Combinator` style.
+```js
+const sum = recursive(self => ([head = 0, ...tail]) => {
+  return tail.length === 0
+    ? head
+    : head + self(tail)
+})
+```
 
 [build-badge]: https://img.shields.io/travis/user/repo/master.png?style=flat-square
 [build]: https://travis-ci.org/user/repo
