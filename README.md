@@ -11,6 +11,8 @@ const sum = recursive(self => ([head = 0, ...tail]) => {
     ? head
     : head + self(tail)
 })
+
+sum([1, 2, 3]) // => 6
 ```
 
 [build-badge]: https://img.shields.io/travis/user/repo/master.png?style=flat-square
