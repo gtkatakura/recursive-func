@@ -6,7 +6,7 @@
 
 Create recursive functions with `Y-Combinator` style with support to create new functions with middlewares without share state.
 ```js
-import { recursive } from 'recursive-func'
+import { recursive, withMiddlewares } from 'recursive-func'
 import memoize from 'memoize'
 
 const log = next => (...args) => {
