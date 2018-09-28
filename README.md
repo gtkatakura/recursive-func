@@ -6,13 +6,41 @@
 
 Create recursive functions with `Y-Combinator` style.
 ```js
+import { recursive } from 'recursive-func'
+
+const log = next => (...args) => {
+  const result = next(...args)
+
+  // will print from the last call to the first
+  console.log('Args = ', args)
+  console.log('Result = ', result)
+
+  return result
+}
+
+const middlewares = [log]
+
 const sum = recursive(self => ([head = 0, ...tail]) => {
   return tail.length === 0
     ? head
     : head + self(tail)
-})
+}, middlewares)
 
-sum([1, 2, 3]) // => 6
+const value = sum([1, 2, 3])
+
+// third call:
+//  Args = [[3]]
+//  Result = 3
+
+// second call:
+//  Args = [[2, 3]]
+//  Result = 5
+
+// first call:
+//  Args = [[1, 2, 3]]
+//  Result = 6
+
+console.log(value) // => 6
 ```
 
 [build-badge]: https://img.shields.io/travis/user/repo/master.png?style=flat-square

@@ -3,35 +3,75 @@ import expect, { createSpy } from 'expect'
 import { recursive } from 'src/index'
 
 describe('recursive', () => {
+  let id
+  let constant
+
+  beforeEach(() => {
+    id = createSpy().andCall(value => value)
+    constant = createSpy().andCall(value => _ => value)
+  })
+
   it('should be a function', () => {
     expect(recursive).toBeA(Function)
   })
 
-  describe('recursive(identity)("one", "two")', () => {
-    let internal
-    let identity
+  describe('recursive(id)("one", "two")', () => {
+    let rec
 
     beforeEach(() => {
-      internal = createSpy().andCall(value => value)
-      identity = recursive(self => internal)
+      rec = recursive(self => id)
     })
 
-    const subject = () => identity('one', 'two')
+    const subject = () => rec('one', 'two')
 
     it('should be called with ("one", "two")', () => {
       subject()
 
-      expect(internal).toHaveBeenCalledWith('one', 'two')
+      expect(id).toHaveBeenCalledWith('one', 'two')
     })
 
     it('should be called 1 time', () => {
       subject()
 
-      expect(internal.calls.length).toEqual(1)
+      expect(id.calls.length).toEqual(1)
     })
 
     it('should return "one"', () => {
       expect(subject()).toEqual('one')
+    })
+  })
+
+  describe('recursive(id, [() => const("three")])("one", "two")', () => {
+    let subject
+    let middleware
+
+    beforeEach(() => {
+      middleware = createSpy().andCall(() => constant('three'))
+      subject = recursive(self => id, [
+        middleware,
+      ])
+    })
+
+    it('should not call λ(id)', () => {
+      subject()
+
+      expect(id).toNotHaveBeenCalled()
+    })
+
+    it('should call λ(middleware) with λ(id)', () => {
+      subject()
+
+      expect(middleware).toHaveBeenCalled(id)
+    })
+
+    it('should call λ(const) with λ(three)', () => {
+      subject()
+
+      expect(constant).toHaveBeenCalled('three')
+    })
+
+    it('should return "three"', () => {
+      expect(subject('one', 'two')).toEqual('three')
     })
   })
 
