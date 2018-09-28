@@ -1,6 +1,6 @@
 import expect, { createSpy } from 'expect'
 
-import { recursive } from 'src/index'
+import { recursive, withMiddlewares } from 'src/index'
 
 describe('recursive', () => {
   let id
@@ -72,6 +72,51 @@ describe('recursive', () => {
 
     it('should return "three"', () => {
       expect(subject('one', 'two')).toEqual('three')
+    })
+  })
+
+  describe('withMiddlewares([M2], recursive(F, [M1])) == recursive(F, [M1, M2])', () => {
+    let internal
+    let cacheMiddleware
+    let sum1
+    let sum2
+
+    beforeEach(() => {
+      cacheMiddleware = createSpy().andCall(next => {
+        const cache = {}
+
+        return (...args) => {
+          const key = JSON.stringify(args)
+
+          if (!cache[key]) {
+            cache[key] = next(...args)
+          }
+
+          return cache[key]
+        }
+      })
+
+
+      internal = createSpy().andCall((self, [head, ...tail]) => {
+        if (tail.length === 0) return head
+        return head + self(tail)
+      })
+
+      sum1 = withMiddlewares(
+        [cacheMiddleware],
+        recursive(self => (...args) => {
+          return internal(self, ...args)
+        }),
+      )
+
+      sum2 = withMiddlewares([], sum1)
+    })
+
+    it('should replay middleware when call withMiddlewares', () => {
+      sum1([1, 2, 3])
+      sum2([1, 2, 3])
+
+      expect(internal.calls.length).toEqual(6)
     })
   })
 

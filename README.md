@@ -7,6 +7,7 @@
 Create recursive functions with `Y-Combinator` style.
 ```js
 import { recursive } from 'recursive-func'
+import memoize from 'memoize'
 
 const log = next => (...args) => {
   const result = next(...args)
@@ -18,15 +19,18 @@ const log = next => (...args) => {
   return result
 }
 
-const middlewares = [log]
+const sum = recursive(
+  self => ([head = 0, ...tail]) => {
+    return tail.length === 0
+      ? head
+      : head + self(tail)
+  },
+  [memoize]
+)
 
-const sum = recursive(self => ([head = 0, ...tail]) => {
-  return tail.length === 0
-    ? head
-    : head + self(tail)
-}, middlewares)
+const sumMemoized = withMiddlewares([log], sum)
 
-const value = sum([1, 2, 3])
+const value1 = sumMemoized([1, 2, 3])
 
 // third call:
 //  Args = [[3]]
@@ -40,7 +44,13 @@ const value = sum([1, 2, 3])
 //  Args = [[1, 2, 3]]
 //  Result = 6
 
-console.log(value) // => 6
+console.log(value1) // => 6
+
+const value2 = sumMemoized([2, 3])
+
+// don't print nothing
+
+console.log(value2) // => 5
 ```
 
 [build-badge]: https://img.shields.io/travis/user/repo/master.png?style=flat-square
