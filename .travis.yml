@@ -5,12 +5,16 @@ node_js:
   - 8
 
 before_install:
-  - npm install codecov.io coveralls
+  - yarn add codecov.io coveralls
 
 after_success:
   - cat ./coverage/lcov.info | ./node_modules/codecov.io/bin/codecov.io.js
   - cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js
+  - nvm install 8 && yarn global add semantic-release
+  - npm run travis-deploy-once "npm run semantic-release"
 
 branches:
   only:
     - master
+
+cache: yarn
