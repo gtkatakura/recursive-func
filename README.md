@@ -4,7 +4,7 @@
 [![npm package][npm-badge]][npm]
 [![Coveralls][coveralls-badge]][coveralls]
 
-Create recursive functions with `Y-Combinator` style with support to create new functions with middlewares without share state.
+Design recursive functions using the `Y-Combinator` style, enabling the creation of new functions with middleware support that applies across the entire call stack while avoiding shared state
 ```js
 import { recursive, withMiddlewares } from 'recursive-func'
 import memoize from 'memoize'
